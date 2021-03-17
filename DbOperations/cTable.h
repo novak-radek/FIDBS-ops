@@ -18,7 +18,7 @@ public:
 	static cTable* Load(char* filename)
 	{
 		std::ifstream is(filename, std::ifstream::binary);
-		uint64_t value;
+
 		cTable* table = NULL;
 		if (is)
 		{
@@ -48,14 +48,14 @@ cTable::cTable(uint32_t columnCount, uint32_t rowCount) {
 	mRowCount = rowCount;
 
 	mData = new uint64_t * [mColumnCount];
-	for (int i = 0; i < mColumnCount; i++)
+	for (uint32_t i = 0; i < mColumnCount; i++)
 	{
 		mData[i] = new uint64_t[mRowCount];
 	}
 }
 
 cTable::~cTable() {
-	for (int i = 0; i < mColumnCount; i++) {
+	for (uint32_t i = 0; i < mColumnCount; i++) {
 		if (mData[i] != NULL) {
 			delete mData[i];
 		}
@@ -94,7 +94,7 @@ uint64_t* cTable::GetColumn(uint32_t column) {
 
 uint64_t* cTable::GetRow(uint32_t row) {
 	uint64_t* outp = new uint64_t[mColumnCount];
-	for (int i = 0; i < mColumnCount; i++) {
+	for (uint32_t i = 0; i < mColumnCount; i++) {
 		outp[i] = mData[i][row];
 	}
 	return outp;

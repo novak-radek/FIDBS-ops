@@ -8,6 +8,9 @@ private:
 	int mPreallocatedCount;
 	int mRowCount;
 	int mColumnCount;
+
+	bool mProjection;
+
 	uint64_t** mData;
 	cRowTable* mNextData;
 
@@ -16,6 +19,7 @@ private:
 public:
 
 	cRowTable(int preallocateRows, int columnCount);
+	cRowTable(int columnCount);
 	~cRowTable();
 
 	void Add(uint64_t* row);
@@ -33,11 +37,26 @@ cRowTable::cRowTable(int preallocateRows, int columnCount) {
 	mRowCount = 0;
 	mColumnCount = columnCount;
 
+	mProjection = false;
+
 	mData = new uint64_t * [preallocateRows];
 	for (int i = 0; i < preallocateRows; i++)
 	{
-		mData[i] = NULL;
+		mData[i] = new uint64_t[columnCount];
 	}
+
+	mNextData = NULL;
+}
+
+cRowTable::cRowTable(int columnCount) {
+	mPreallocatedCount = 1;
+	mRowCount = 0;
+	mColumnCount = columnCount;
+
+	mProjection = true;
+
+	mData = new uint64_t * [1];
+	mData[0] = new uint64_t[columnCount];
 
 	mNextData = NULL;
 }
@@ -61,9 +80,13 @@ void cRowTable::Add(uint64_t* row) {
 		return;
 	}
 
-	mData[mRowCount++] = row;
+	for (int i = 0; i < mColumnCount; i++) {
+		mData[mRowCount][i] = row[i];
+	}
 
-	if (mRowCount == mPreallocatedCount) {
+	mRowCount++;
+
+	if (mRowCount == mPreallocatedCount && !mProjection) {
 		mNextData = new cRowTable(mPreallocatedCount, mColumnCount);
 	}
 }
@@ -92,7 +115,7 @@ int cRowTable::GetColumnCount() {
 }
 
 cRowTable* cRowTable::Projection_Sum(int* attrList, int attrCount) {
-	cRowTable* table = new cRowTable(2, attrCount);
+	cRowTable* table = new cRowTable(attrCount);
 	uint64_t* sums = new uint64_t[attrCount];
 
 	for (int i = 0; i < attrCount; i++) {
