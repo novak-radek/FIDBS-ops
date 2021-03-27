@@ -23,6 +23,7 @@ public:
 	~cRowTable();
 
 	void Add(uint64_t* row);
+	void Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1);
 	void Print();
 	void PrintSample();
 	
@@ -84,6 +85,30 @@ void cRowTable::Add(uint64_t* row) {
 
 	for (int i = 0; i < mColumnCount; i++) {
 		mData[mRowCount][i] = row[i];
+	}
+
+	mRowCount++;
+
+	if (mRowCount == mPreallocatedCount && !mProjection) {
+		mNextData = new cRowTable(mPreallocatedCount, mColumnCount);
+	}
+}
+
+void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1) {
+	if (mNextData != NULL) {
+		mNextData->Add(row0, row1, columnCount0, columnCount1);
+		return;
+	}
+
+	int index = 0;
+	for (int i = 0; i < columnCount0; i++) {
+		mData[mRowCount][i] = row0[i];
+		index++;
+	}
+
+	for (int i = 0; i < columnCount1; i++) {
+		mData[mRowCount][index] = row1[i];
+		index++;
 	}
 
 	mRowCount++;

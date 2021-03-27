@@ -54,6 +54,7 @@ public:
     void Sum();
 
     void PrintData();
+    void PrintTest();
 
 };
 
@@ -236,8 +237,8 @@ void cQueryHandler::Join() {
 void cQueryHandler::Select() {
     int column = 0;
     int i = 0;
-    while (i < mSelectionTable-1) {
-        column += mTablesColumnCountArr[i--];
+    while (i < mSelectionTable) {
+        column += mTablesColumnCountArr[i++];
     }
     column += mSelectionColumn;
 
@@ -271,6 +272,10 @@ void cQueryHandler::PrintData() {
     }
     r_sum->Print();
 
-    printf("\nData in joined table:\n");
+    printf("\nData in joined table after selection (%d rows):\n", r_sel->GetRowCount());
     r_sel->PrintSample();
+}
+
+void cQueryHandler::PrintTest() {
+    mColumnTables[0]->Print();
 }

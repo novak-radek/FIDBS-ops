@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <fstream>
+#include <inttypes.h>
 
 
 class cTable
@@ -40,6 +41,8 @@ public:
 
 	uint64_t* GetColumn(uint32_t column);
 	uint64_t* GetRow(uint32_t row);
+
+	void Print();
 
 };
 
@@ -102,6 +105,15 @@ uint64_t* cTable::GetRow(uint32_t row) {
 		outp[i] = mData[i][row];
 	}
 	return outp;
+}
+
+void cTable::Print() {
+	for (int i = 0; i < mColumnCount; i++) {
+		for (int j = 0; j < mRowCount; j++) {
+			printf("%" PRIu64 "\t", mData[i][j]);
+		}
+		printf("\n");
+	}
 }
 
 

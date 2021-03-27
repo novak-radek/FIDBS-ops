@@ -26,15 +26,7 @@ public:
 		for (uint32_t i = 0; i < rowCount0; i++) {
 			for (uint32_t j = 0; j < rowCount1; j++) {
 				if (column0[i] == column1[j]) {
-					uint64_t* result = new uint64_t[(uint64_t)columnCount0 + (uint64_t)columnCount1];
-
-					uint64_t* row0 = r0->GetRow(i);
-					uint64_t* row1 = r1->GetRow(j);
-
-					std::copy(row0, row0 + columnCount0, result);
-					std::copy(row1, row1 + columnCount1, result + columnCount0);
-
-					table->Add(result);
+					table->Add(r0->GetRow(i), r1->GetRow(j), columnCount0, columnCount1);
 				}
 			}
 		}

@@ -24,6 +24,7 @@ int main()
     while (std::getline(file, inputQuery)) {
         handlers[i++] = new cQueryHandler(inputQuery, preallocateRows, tablesPath);
     }
+    
 
     for (int i = 0; i < numOfRows; i++) {
 
@@ -39,7 +40,9 @@ int main()
 
         handlers[i]->PrintData();
 
-        printf("\nDuration of operations join, select and sum: %.5fs\n\n\n", time_span);
+        printf("\nDuration of operations join, select and sum: %.5fs\n\n", time_span);
+
+        printf("-----------------------------------------------------------------------\n\n");
     }
 
 
