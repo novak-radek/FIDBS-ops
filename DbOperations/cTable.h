@@ -67,11 +67,15 @@ cTable::~cTable() {
 
 void cTable::Read(std::ifstream &is)
 {
-	for(uint32_t i = 0; i < mColumnCount; i++)
+	//for(uint32_t i = 0; i < mColumnCount; i++)
+	//{
+	//	for (uint32_t j = 0; j < mRowCount; j++) {
+	//		is.read((char*)&mData[i][j], sizeof(uint64_t));
+	//	}
+	//}
+	for (uint32_t i = 0; i < mColumnCount; i++)
 	{
-		for (uint32_t j = 0; j < mRowCount; j++) {
-			is.read((char*)&mData[i][j], sizeof(uint64_t));
-		}
+		is.read((char*)&mData[i][0], sizeof(uint64_t) * mRowCount);
 	}
 }
 

@@ -11,6 +11,7 @@
 int main()
 {
     const int preallocateRows = 1000;
+    const char* tablesPath = "../tables/";
 
     std::ifstream inFile("queries.txt");
     int numOfRows = std::count(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>(), '\n') + 1;
@@ -21,7 +22,7 @@ int main()
     std::ifstream file("queries.txt");
     std::string inputQuery;
     while (std::getline(file, inputQuery)) {
-        handlers[i++] = new cQueryHandler(inputQuery, preallocateRows);
+        handlers[i++] = new cQueryHandler(inputQuery, preallocateRows, tablesPath);
     }
 
     for (int i = 0; i < numOfRows; i++) {
@@ -38,7 +39,7 @@ int main()
 
         handlers[i]->PrintData();
 
-        printf("Duration of operations join, select and sum: %.5fs\n\n\n", time_span);
+        printf("\nDuration of operations join, select and sum: %.5fs\n\n\n", time_span);
     }
 
 

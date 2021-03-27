@@ -12,6 +12,8 @@ class cQueryHandler
 {
 private:
     int mPreallocateRows;
+    const char* mTablesPath;
+
 	std::string mInputString;
     std::string mHelpString;
 
@@ -44,7 +46,7 @@ private:
 
 public:
 
-	cQueryHandler(std::string inputString, int preallocateRows);
+	cQueryHandler(std::string inputString, int preallocateRows, const char* tablesPath);
 	~cQueryHandler();
 
     void Join();
@@ -55,7 +57,8 @@ public:
 
 };
 
-cQueryHandler::cQueryHandler(std::string inputString, int preallocateRows) {
+cQueryHandler::cQueryHandler(std::string inputString, int preallocateRows, const char* tablesPath) {
+    mTablesPath = tablesPath;
     mPreallocateRows = preallocateRows;
 	mInputString = inputString;
     mHelpString = inputString.substr(inputString.find("|") + 1, sizeof(inputString));
@@ -126,7 +129,7 @@ void cQueryHandler::LoadTables() {
 
     for (int i = 0; i < mTablesCount; i++) {
         char path[50];
-        sprintf_s(path, "../tables/r%d", mTablesArr[i]);
+        sprintf_s(path, "%sr%d", mTablesPath, mTablesArr[i]);
         mColumnTables[i] = cTable::Load(path);
     }
 
