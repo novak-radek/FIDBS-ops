@@ -29,5 +29,8 @@
     <ClInclude Include="cJoin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cQueryHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

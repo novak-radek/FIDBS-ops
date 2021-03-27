@@ -98,7 +98,6 @@ uint64_t* cTable::GetRow(uint32_t row) {
 		outp[i] = mData[i][row];
 	}
 	return outp;
-
 }
 
 

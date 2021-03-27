@@ -24,11 +24,13 @@ public:
 
 	void Add(uint64_t* row);
 	void Print();
+	void PrintSample();
 	
 	int GetRowCount();
 	int GetColumnCount();
 
 	cRowTable* Projection_Sum(int* attrList, int attrCount);
+	cRowTable* Selection(char operation, int column, uint64_t value);
 	
 };
 
@@ -103,6 +105,24 @@ void cRowTable::Print() {
 	}
 }
 
+void cRowTable::PrintSample() {
+	int counter = 0;
+	for (int i = 0; i < mRowCount; i++) {
+		if (counter == 3) {
+			break;
+		}
+
+		for (int j = 0; j < mColumnCount; j++) {
+			printf("%" PRIu64 "\t", mData[i][j]);
+		}
+		printf("\n");
+		counter++;
+	}
+	if (counter < mRowCount) {
+		printf("...\n");
+	}
+}
+
 int cRowTable::GetRowCount() {
 	if (mNextData != NULL) {
 		return mPreallocatedCount + mNextData->GetRowCount();
@@ -139,6 +159,37 @@ uint64_t cRowTable::GetColumnCount(int column) {
 	}
 
 	return counter;
+}
+
+cRowTable* cRowTable::Selection(char operation, int column, uint64_t value) {
+	cRowTable* table = NULL;
+	if (mNextData != NULL) {
+		table = mNextData->Selection(operation, column, value);
+	}
+	else {
+		table = new cRowTable(mPreallocatedCount, mColumnCount);
+	}
+
+	for (int i = 0; i < mRowCount; i++) {
+		if (operation == '=') {
+			if (mData[i][column] == value) {
+				table->Add(mData[i]);
+			}
+		}
+		else if (operation == '>') {
+			if (mData[i][column] > value) {
+				table->Add(mData[i]);
+			}
+		}
+		else if (operation == '<') {
+			if (mData[i][column] < value) {
+				table->Add(mData[i]);
+			}
+		}
+	}
+
+
+	return table;
 }
 
 
