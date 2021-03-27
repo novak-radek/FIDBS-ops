@@ -30,6 +30,10 @@ public:
 	int GetRowCount();
 	int GetColumnCount();
 
+	uint64_t* GetColumn(uint32_t column);
+	void GetColumn(uint64_t** out, uint32_t column, uint32_t shift);
+	uint64_t* GetRow(uint32_t row);
+
 	cRowTable* Projection_Sum(int* attrList, int attrCount);
 	cRowTable* Selection(char operation, int column, uint64_t value);
 	
@@ -215,6 +219,30 @@ cRowTable* cRowTable::Selection(char operation, int column, uint64_t value) {
 
 
 	return table;
+}
+
+uint64_t* cRowTable::GetColumn(uint32_t column) {
+	uint64_t* outp = new uint64_t[GetRowCount()];
+	for (uint32_t i = 0; i < mRowCount; i++) {
+		outp[i] = mData[i][column];
+	}
+	if (mNextData != NULL) {
+		uint64_t* nextColumn = mNextData->GetColumn(column);
+		for (int i = mRowCount; i < GetRowCount(); i++) {
+			outp[i] = nextColumn[i- mRowCount];
+		}
+	}
+	return outp;
+}
+
+
+uint64_t* cRowTable::GetRow(uint32_t row) {
+	if (row < mRowCount) {
+		return mData[row];
+	}
+	else {
+		return mNextData->GetRow(row - mRowCount);
+	}
 }
 
 

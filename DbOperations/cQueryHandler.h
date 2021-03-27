@@ -39,6 +39,8 @@ private:
     cRowTable* r_sel;
     cRowTable* r_sum;
 
+    bool mSelectFirst;
+
     void LoadTables();
     void GetProjectionAttrs();
     void GetJoinAttrs();
@@ -69,6 +71,7 @@ cQueryHandler::cQueryHandler(std::string inputString, int preallocateRows, const
     GetJoinAttrs();
     GetSelectionAttrs();
 
+    mSelectFirst = false;
 }
 
 cQueryHandler::~cQueryHandler() {
@@ -231,22 +234,43 @@ void cQueryHandler::GetSelectionAttrs() {
 }
 
 void cQueryHandler::Join() {
-    r_join = cJoin::NestedLoop(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
+    if (r_sel == NULL) {
+        r_join = cJoin::NestedLoop(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
+    }
+    else {
+        if (mSelectionTable == 0) {
+            r_join = cJoin::NestedLoop(r_sel, mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
+        }
+        else {
+            r_join = cJoin::NestedLoop(mColumnTables[0], r_sel, mJoinC1, mJoinC2, mPreallocateRows);
+        }
+    }
 }
 
 void cQueryHandler::Select() {
-    int column = 0;
-    int i = 0;
-    while (i < mSelectionTable) {
-        column += mTablesColumnCountArr[i++];
-    }
-    column += mSelectionColumn;
+    if (r_join != NULL) {
+        int column = 0;
+        int i = 0;
+        while (i < mSelectionTable) {
+            column += mTablesColumnCountArr[i++];
+        }
+        column += mSelectionColumn;
 
-    r_sel = r_join->Selection(mOperation, column, mSelectionValue);
+        r_sel = r_join->Selection(mOperation, column, mSelectionValue);
+    }
+    else {
+        mSelectFirst = true;
+        r_sel = mColumnTables[mSelectionTable]->Selection(mOperation, mSelectionColumn, mSelectionValue);
+    }
 }
 
 void cQueryHandler::Sum() {
-    r_sum = r_sel->Projection_Sum(mProjectionAttrs, mProjectionAttrCount);
+    if (!mSelectFirst) {
+        r_sum = r_sel->Projection_Sum(mProjectionAttrs, mProjectionAttrCount);
+    }
+    else {
+        r_sum = r_join->Projection_Sum(mProjectionAttrs, mProjectionAttrCount);
+    }
 }
 
 void cQueryHandler::PrintData() {
@@ -272,8 +296,14 @@ void cQueryHandler::PrintData() {
     }
     r_sum->Print();
 
-    printf("\nData in joined table after selection (%d rows):\n", r_sel->GetRowCount());
-    r_sel->PrintSample();
+    if (!mSelectFirst) {
+        printf("\nData in joined table after selection (%d rows):\n", r_sel->GetRowCount());
+        r_sel->PrintSample();
+    }
+    else {
+        printf("\nData in joined table after selection (%d rows):\n", r_join->GetRowCount());
+        r_join->PrintSample();
+    }
 }
 
 void cQueryHandler::PrintTest() {

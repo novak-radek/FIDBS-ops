@@ -30,8 +30,8 @@ int main()
 
         auto t1 = std::chrono::high_resolution_clock::now();
 
-        handlers[i]->Join();
         handlers[i]->Select();
+        handlers[i]->Join();
         handlers[i]->Sum();
 
 

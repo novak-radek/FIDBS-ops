@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <fstream>
 #include <inttypes.h>
+#include "cRowTable.h"
 
 
 class cTable
@@ -41,6 +42,8 @@ public:
 
 	uint64_t* GetColumn(uint32_t column);
 	uint64_t* GetRow(uint32_t row);
+
+	cRowTable* Selection(char operation, int column, uint64_t value);
 
 	void Print();
 
@@ -114,6 +117,30 @@ void cTable::Print() {
 		}
 		printf("\n");
 	}
+}
+
+cRowTable* cTable::Selection(char operation, int column, uint64_t value) {
+	cRowTable* table = new cRowTable(1000, mColumnCount);
+
+	for (int i = 0; i < mRowCount; i++) {
+		if (operation == '=') {
+			if (mData[column][i] == value) {
+				table->Add(GetRow(i));
+			}
+		}
+		else if (operation == '>') {
+			if (mData[column][i] > value) {
+				table->Add(GetRow(i));
+			}
+		}
+		else if (operation == '<') {
+			if (mData[column][i] < value) {
+				table->Add(GetRow(i));
+			}
+		}
+	}
+
+	return table;
 }
 
 
