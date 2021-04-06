@@ -310,8 +310,8 @@ void cQueryHandler::PrintData() {
 
 void cQueryHandler::ShortPrintData() {
     std::cout << mInputString << "\n";
-
     r_sum->Print();
+    printf("Joined table - %d columns and %d rows.\n", r_join->GetColumnCount(), r_join->GetRowCount());
 }
 
 void cQueryHandler::PrintTest() {

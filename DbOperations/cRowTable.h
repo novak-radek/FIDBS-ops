@@ -138,6 +138,14 @@ void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint3
 }
 
 void cRowTable::Print() {
+	if (mNextData == NULL && mRowCount == 0) {
+		for (int j = 0; j < mColumnCount; j++) {
+			printf("NULL\t");
+		}
+		printf("\n");
+		return;
+	}
+
 	for (int i = 0; i < mRowCount; i++) {
 		for (int j = 0; j < mColumnCount; j++) {
 			printf("%" PRIu64 "\t", mData[i][j]);
@@ -180,6 +188,9 @@ int cRowTable::GetColumnCount() {
 
 cRowTable* cRowTable::Projection_Sum(int* attrList, int attrCount) {
 	cRowTable* table = new cRowTable(attrCount);
+	if (mNextData == NULL && mRowCount == 0) {
+		return table;
+	}
 	uint64_t* sums = new uint64_t[attrCount];
 
 	for (int i = 0; i < attrCount; i++) {
