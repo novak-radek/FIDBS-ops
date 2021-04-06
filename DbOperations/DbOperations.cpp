@@ -11,7 +11,8 @@
 int main()
 {
     const int preallocateRows = 1000;
-    const char* tablesPath = "../tables/";
+    //const char* tablesPath = "../tables/";
+    const char* tablesPath = "";
 
     std::ifstream inFile("queries.txt");
     int numOfRows = std::count(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>(), '\n') + 1;
@@ -24,7 +25,8 @@ int main()
     while (std::getline(file, inputQuery)) {
         handlers[i++] = new cQueryHandler(inputQuery, preallocateRows, tablesPath);
     }
-    
+
+    auto tStart = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < numOfRows; i++) {
 
@@ -38,13 +40,18 @@ int main()
         auto t2 = std::chrono::high_resolution_clock::now();
         auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
-        handlers[i]->PrintData();
+        //handlers[i]->PrintData();
+        handlers[i]->ShortPrintData();
 
-        printf("\nDuration of operations join, select and sum: %.5fs\n\n", time_span);
+        printf("Duration of operations join, select and sum: %.5fs\n", time_span);
 
-        printf("-----------------------------------------------------------------------\n\n");
+        printf("-----------------------------------------------------------------------\n");
     }
 
+
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto time_span_full = std::chrono::duration_cast<std::chrono::duration<double>>(tEnd - tStart);
+    printf("\nTotal duration: %.5fs\n\n", time_span_full);
 
     for (int i = 0; i < numOfRows; i++) {
         delete handlers[i];

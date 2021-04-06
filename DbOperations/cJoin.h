@@ -53,12 +53,12 @@ public:
 		for (uint32_t i = 0; i < rowCount0; i++) {
 			for (uint32_t j = 0; j < rowCount1; j++) {
 				if (column0[i] == column1[j]) {
-					table->Add(r0->GetRow(i), r1->GetRow(j), columnCount0, columnCount1);
+					table->Add(r0->GetRow(i), r1->GetRow(j), columnCount0, columnCount1, 1);
 				}
 			}
 		}
 
-
+		//delete[] column0;
 		return table;
 	}
 
@@ -80,12 +80,12 @@ public:
 		for (uint32_t i = 0; i < rowCount0; i++) {
 			for (uint32_t j = 0; j < rowCount1; j++) {
 				if (column0[i] == column1[j]) {
-					table->Add(r0->GetRow(i), r1->GetRow(j), columnCount0, columnCount1);
+					table->Add(r0->GetRow(i), r1->GetRow(j), columnCount0, columnCount1, 0);
 				}
 			}
 		}
 
-
+		//delete[] column1;
 		return table;
 	}
 

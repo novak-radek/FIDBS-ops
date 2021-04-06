@@ -56,6 +56,7 @@ public:
     void Sum();
 
     void PrintData();
+    void ShortPrintData();
     void PrintTest();
 
 };
@@ -72,6 +73,7 @@ cQueryHandler::cQueryHandler(std::string inputString, int preallocateRows, const
     GetSelectionAttrs();
 
     mSelectFirst = false;
+    r_sel = NULL;
 }
 
 cQueryHandler::~cQueryHandler() {
@@ -304,6 +306,12 @@ void cQueryHandler::PrintData() {
         printf("\nData in joined table after selection (%d rows):\n", r_join->GetRowCount());
         r_join->PrintSample();
     }
+}
+
+void cQueryHandler::ShortPrintData() {
+    std::cout << mInputString << "\n";
+
+    r_sum->Print();
 }
 
 void cQueryHandler::PrintTest() {

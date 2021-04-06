@@ -125,17 +125,17 @@ cRowTable* cTable::Selection(char operation, int column, uint64_t value) {
 	for (int i = 0; i < mRowCount; i++) {
 		if (operation == '=') {
 			if (mData[column][i] == value) {
-				table->Add(GetRow(i));
+				table->Add(GetRow(i), true);
 			}
 		}
 		else if (operation == '>') {
 			if (mData[column][i] > value) {
-				table->Add(GetRow(i));
+				table->Add(GetRow(i), true);
 			}
 		}
 		else if (operation == '<') {
 			if (mData[column][i] < value) {
-				table->Add(GetRow(i));
+				table->Add(GetRow(i), true);
 			}
 		}
 	}

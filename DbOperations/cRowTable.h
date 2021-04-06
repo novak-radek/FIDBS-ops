@@ -22,8 +22,8 @@ public:
 	cRowTable(int columnCount);
 	~cRowTable();
 
-	void Add(uint64_t* row);
-	void Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1);
+	void Add(uint64_t* row, bool del);
+	void Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1, int del);
 	void Print();
 	void PrintSample();
 	
@@ -81,9 +81,9 @@ cRowTable::~cRowTable() {
 	delete mData;
 }
 
-void cRowTable::Add(uint64_t* row) {
+void cRowTable::Add(uint64_t* row, bool del = false) {
 	if (mNextData != NULL) {
-		mNextData->Add(row);
+		mNextData->Add(row, del);
 		return;
 	}
 
@@ -93,14 +93,18 @@ void cRowTable::Add(uint64_t* row) {
 
 	mRowCount++;
 
+	if (del) {
+		delete[] row;
+	}
+
 	if (mRowCount == mPreallocatedCount && !mProjection) {
 		mNextData = new cRowTable(mPreallocatedCount, mColumnCount);
 	}
 }
 
-void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1) {
+void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint32_t columnCount1, int del = 999) {
 	if (mNextData != NULL) {
-		mNextData->Add(row0, row1, columnCount0, columnCount1);
+		mNextData->Add(row0, row1, columnCount0, columnCount1, del);
 		return;
 	}
 
@@ -116,6 +120,17 @@ void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint3
 	}
 
 	mRowCount++;
+
+	if (del == 0) {
+		delete[] row0;
+	}
+	else if (del == 1) {
+		delete[] row1;
+	}
+	else {
+		delete[] row0;
+		delete[] row1;
+	}
 
 	if (mRowCount == mPreallocatedCount && !mProjection) {
 		mNextData = new cRowTable(mPreallocatedCount, mColumnCount);
@@ -173,10 +188,13 @@ cRowTable* cRowTable::Projection_Sum(int* attrList, int attrCount) {
 
 	table->Add(sums);
 
+	delete[] sums;
+
 	return table;
 }
 
 uint64_t cRowTable::GetColumnCount(int column) {
+
 	uint64_t counter = 0;
 
 	for (int i = 0; i < mRowCount; i++) {
@@ -231,6 +249,8 @@ uint64_t* cRowTable::GetColumn(uint32_t column) {
 		for (int i = mRowCount; i < GetRowCount(); i++) {
 			outp[i] = nextColumn[i- mRowCount];
 		}
+
+		delete[] nextColumn;
 	}
 	return outp;
 }
