@@ -139,10 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cMemory.cpp" />
     <ClCompile Include="DbOperations.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cHashTable.h" />
+    <ClInclude Include="cHashTableNode.h" />
     <ClInclude Include="cJoin.h" />
+    <ClInclude Include="cMemory.h" />
     <ClInclude Include="cRowTable.h" />
     <ClInclude Include="cTable.h" />
     <ClInclude Include="cQueryHandler.h" />

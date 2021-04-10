@@ -32,7 +32,12 @@ int main()
 
     for (int i = 0; i < numOfRows; i++) {
 
-        auto t1 = std::chrono::high_resolution_clock::now();
+        handlers[i]->HashJoin();
+        handlers[i]->Select();
+        handlers[i]->Sum();
+        handlers[i]->PrintQuery();
+
+        /*auto t1 = std::chrono::high_resolution_clock::now();
 
         handlers[i]->Join();
         handlers[i]->Select();
@@ -43,11 +48,31 @@ int main()
         auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
         //handlers[i]->PrintData();
+        handlers[i]->PrintQuery();
+        printf("\nNested-loop join -> select:\n");
         handlers[i]->ShortPrintData();
 
         printf("Duration of operations join, select and sum: %.5fs\n", time_span);
 
-        printf("-----------------------------------------------------------------------\n");
+        printf("\n");
+
+        auto t3 = std::chrono::high_resolution_clock::now();
+
+        handlersV2[i]->Select();
+        handlersV2[i]->Join();
+        handlersV2[i]->Sum();
+
+
+        auto t4 = std::chrono::high_resolution_clock::now();
+        auto time_span2 = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
+
+        //handlers[i]->PrintData();
+        printf("Select -> Nested-loop join:\n");
+        handlersV2[i]->ShortPrintData();
+
+        printf("Duration of operations select, join and sum: %.5fs\n", time_span2);
+
+        printf("-----------------------------------------------------------------------\n");*/
     }
 
 
@@ -59,32 +84,32 @@ int main()
 
 
 
-    auto tStartV2 = std::chrono::high_resolution_clock::now();
+    //auto tStartV2 = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < numOfRows; i++) {
+    //for (int i = 0; i < numOfRows; i++) {
 
-        auto t1 = std::chrono::high_resolution_clock::now();
+    //    auto t1 = std::chrono::high_resolution_clock::now();
 
-        handlersV2[i]->Select();
-        handlersV2[i]->Join();
-        handlersV2[i]->Sum();
-
-
-        auto t2 = std::chrono::high_resolution_clock::now();
-        auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-
-        //handlers[i]->PrintData();
-        handlersV2[i]->ShortPrintData();
-
-        printf("Duration of operations join, select and sum: %.5fs\n", time_span);
-
-        printf("-----------------------------------------------------------------------\n");
-    }
+    //    handlersV2[i]->Select();
+    //    handlersV2[i]->Join();
+    //    handlersV2[i]->Sum();
 
 
-    auto tEndV2 = std::chrono::high_resolution_clock::now();
-    auto time_span_fullV2 = std::chrono::duration_cast<std::chrono::duration<double>>(tEndV2 - tStartV2);
-    printf("\nTotal duration: %.5fs\n\n", time_span_fullV2);
+    //    auto t2 = std::chrono::high_resolution_clock::now();
+    //    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+    //    //handlers[i]->PrintData();
+    //    handlersV2[i]->ShortPrintData();
+
+    //    printf("Duration of operations join, select and sum: %.5fs\n", time_span);
+
+    //    printf("-----------------------------------------------------------------------\n");
+    //}
+
+
+    //auto tEndV2 = std::chrono::high_resolution_clock::now();
+    //auto time_span_fullV2 = std::chrono::duration_cast<std::chrono::duration<double>>(tEndV2 - tStartV2);
+    //printf("\nTotal duration: %.5fs\n\n", time_span_fullV2);
 
 
 

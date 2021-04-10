@@ -52,12 +52,14 @@ public:
 	~cQueryHandler();
 
     void Join();
+    void HashJoin();
     void Select();
     void Sum();
 
     void PrintData();
     void ShortPrintData();
     void PrintTest();
+    void PrintQuery();
 
 };
 
@@ -249,6 +251,10 @@ void cQueryHandler::Join() {
     }
 }
 
+void cQueryHandler::HashJoin() {
+    r_join = cJoin::Hash(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
+}
+
 void cQueryHandler::Select() {
     if (r_join != NULL) {
         int column = 0;
@@ -309,9 +315,12 @@ void cQueryHandler::PrintData() {
 }
 
 void cQueryHandler::ShortPrintData() {
+    printf("Joined table - %d columns and %d rows.\n", r_join->GetColumnCount(), r_join->GetRowCount());
+}
+
+void cQueryHandler::PrintQuery() {
     std::cout << mInputString << "\n";
     r_sum->Print();
-    printf("Joined table - %d columns and %d rows.\n", r_join->GetColumnCount(), r_join->GetRowCount());
 }
 
 void cQueryHandler::PrintTest() {
