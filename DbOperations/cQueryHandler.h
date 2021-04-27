@@ -52,7 +52,7 @@ public:
 	~cQueryHandler();
 
     void Join();
-    void HashJoin();
+    void HashJoin(cMemory* memory);
     void Select();
     void Sum();
 
@@ -251,8 +251,18 @@ void cQueryHandler::Join() {
     }
 }
 
-void cQueryHandler::HashJoin() {
-    r_join = cJoin::Hash(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
+void cQueryHandler::HashJoin(cMemory* memory) {
+    if (r_sel == NULL) {
+        r_join = cJoin::Hash(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows, memory);
+    }
+    else {
+        if (mSelectionTable == 0) {
+            r_join = cJoin::Hash(r_sel, mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows, memory);
+        }
+        else {
+            r_join = cJoin::Hash(mColumnTables[0], r_sel, mJoinC1, mJoinC2, mPreallocateRows, memory);
+        }
+    }
 }
 
 void cQueryHandler::Select() {
@@ -319,8 +329,8 @@ void cQueryHandler::ShortPrintData() {
 }
 
 void cQueryHandler::PrintQuery() {
-    std::cout << mInputString << "\n";
-    r_sum->Print();
+    std::cout << mInputString << "\n\n";
+    //r_sum->Print();
 }
 
 void cQueryHandler::PrintTest() {

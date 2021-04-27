@@ -22,7 +22,7 @@ public:
 
 	bool Add(const TKey& key, const TData& data);
 	bool AddWithoutRecursion(const TKey& key, const TData& data);
-	bool FindWithoutRecursion(const TKey& key, TData& data) const;
+	TData* FindWithoutRecursion(const TKey& key, int& retCount) const;
 	bool Find(const TKey& key, TData& data) const;
 	void PrintStat() const;
 };
@@ -89,9 +89,6 @@ bool cHashTable<TKey, TData>::AddWithoutRecursion(const TKey& key, const TData& 
 	else {
 		cHashTableNode<TKey, TData>* invNode = mHashTable[hv];
 		while (invNode->HasNextNode()) {
-			if (invNode->GetKey() == key) {
-				return false;
-			}
 			invNode = invNode->GetNextNode();
 		}
 		invNode->SetNextNode(mMemory, key, data);
@@ -117,30 +114,49 @@ bool cHashTable<TKey, TData>::Find(const TKey& key, TData& data) const
 }
 
 template<class TKey, class TData>
-bool cHashTable<TKey, TData>::FindWithoutRecursion(const TKey& key, TData& data) const
+TData* cHashTable<TKey, TData>::FindWithoutRecursion(const TKey& key, int &retCount) const
 {
 	int hv = HashValue(key);
 
 	cHashTableNode<TKey, TData>* invNode = mHashTable[hv];
 
+
+
 	if (invNode == NULL) {
-		return false;
+		return NULL;
 	}
 
 	if (invNode->GetKey() == key) {
-		data = invNode->GetData();
-		return true;
+		retCount++;
 	}
 
 	while (invNode->HasNextNode()) {
 		invNode = invNode->GetNextNode();
 		if (invNode->GetKey() == key) {
-			data = invNode->GetData();
-			return true;
+			retCount++;
 		}
 	}
 
-	return false;
+	if (retCount == 0) {
+		return NULL;
+	}
+
+	invNode = mHashTable[hv];
+	TData* result = new TData[retCount];
+	int index = 0;
+
+	if (invNode->GetKey() == key) {
+		result[index++] = invNode->GetData();
+	}
+
+	while (invNode->HasNextNode()) {
+		invNode = invNode->GetNextNode();
+		if (invNode->GetKey() == key) {
+			result[index++] = invNode->GetData();
+		}
+	}
+
+	return result;
 }
 
 template<class TKey, class TData>

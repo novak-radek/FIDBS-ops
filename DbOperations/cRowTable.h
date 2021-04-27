@@ -127,7 +127,7 @@ void cRowTable::Add(uint64_t* row0, uint64_t* row1, uint32_t columnCount0, uint3
 	else if (del == 1) {
 		delete[] row1;
 	}
-	else {
+	else if (del != 3) {
 		delete[] row0;
 		delete[] row1;
 	}

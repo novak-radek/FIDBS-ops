@@ -7,20 +7,25 @@ private:
 	int mCapacity;
 	int mSize;
 	char* mData;
+	cMemory* mNext;
 public:
 	cMemory(int capacity);
 	~cMemory();
 	inline char* New(int size);
+	void Reset();
 	void PrintStat() const;
 };
 
 char* cMemory::New(int size)
 {
+	if (mNext != NULL) {
+		return mNext->New(size);
+	}
 	char* mem = NULL;
 	if (mSize + size >= mCapacity)
 	{
-		printf("Critical Error: cMemory::New(): There is no memory. \n");
-		mem = NULL;
+		mNext = new cMemory(mCapacity);
+		return mNext->New(size);
 	}
 	else {
 		mem = mData + mSize;
