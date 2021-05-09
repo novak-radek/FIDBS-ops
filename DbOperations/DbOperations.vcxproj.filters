@@ -44,5 +44,8 @@
     <ClInclude Include="cHashTableNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IndexHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

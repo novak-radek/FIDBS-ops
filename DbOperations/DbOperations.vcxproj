@@ -150,6 +150,7 @@
     <ClInclude Include="cRowTable.h" />
     <ClInclude Include="cTable.h" />
     <ClInclude Include="cQueryHandler.h" />
+    <ClInclude Include="IndexHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,6 +6,7 @@
 #include "cTable.h"
 #include "cRowTable.h"
 #include "cJoin.h"
+#include "IndexHandler.h"
 
 
 class cQueryHandler
@@ -41,6 +42,7 @@ private:
 
     bool mSelectFirst;
 
+
     void LoadTables();
     void GetProjectionAttrs();
     void GetJoinAttrs();
@@ -54,6 +56,7 @@ public:
     void Join();
     void HashJoin(cMemory* memory);
     void Select();
+    void SelectWithIndex(cMemory* memory, IndexHandler* indexHandler);
     void Sum();
 
     void PrintData();
@@ -68,6 +71,7 @@ cQueryHandler::cQueryHandler(std::string inputString, int preallocateRows, const
     mPreallocateRows = preallocateRows;
 	mInputString = inputString;
     mHelpString = inputString.substr(inputString.find("|") + 1, sizeof(inputString));
+
 
 	LoadTables();
     GetProjectionAttrs();
@@ -111,6 +115,7 @@ cQueryHandler::~cQueryHandler() {
     if (r_sum != NULL) {
         delete r_sum;
     }
+
 }
 
 
@@ -237,6 +242,8 @@ void cQueryHandler::GetSelectionAttrs() {
     temp_str = "";
 }
 
+
+
 void cQueryHandler::Join() {
     if (r_sel == NULL) {
         r_join = cJoin::NestedLoop(mColumnTables[0], mColumnTables[1], mJoinC1, mJoinC2, mPreallocateRows);
@@ -279,6 +286,63 @@ void cQueryHandler::Select() {
     else {
         mSelectFirst = true;
         r_sel = mColumnTables[mSelectionTable]->Selection(mOperation, mSelectionColumn, mSelectionValue);
+    }
+}
+
+void cQueryHandler::SelectWithIndex(cMemory* memory, IndexHandler* indexHandler) {
+    if (r_join != NULL) {
+        int column = 0;
+        int i = 0;
+        while (i < mSelectionTable) {
+            column += mTablesColumnCountArr[i++];
+        }
+        column += mSelectionColumn;
+
+        int indexNumber = mTablesArr[0] * 10000 + mTablesArr[1] * 100 + mSelectionColumn;
+
+        if (!indexHandler->IndexExistsJoin(indexNumber)) {
+            indexHandler->Add(r_join, (uint16_t)column, memory, indexNumber);
+        }
+
+        auto index = indexHandler->GetIndexJoin(indexNumber);
+        int retCount = 0;
+        uint64_t*** values = index->FindWithoutRecursion((uint64_t)mSelectionValue, retCount);
+
+        if (retCount == 0) {
+            r_sel = new cRowTable(r_join->GetColumnCount());;
+            return;
+        }
+
+        r_sel = new cRowTable(mPreallocateRows, r_join->GetColumnCount());
+
+        for (int i = 0; i < retCount; i++) {
+            r_sel->Add(*values[i]);
+        }
+
+    }
+    else {
+        mSelectFirst = true;
+
+        int indexNumber = mTablesArr[mSelectionTable] * 100 + mSelectionColumn;
+
+        if (!indexHandler->IndexExistsSelect(indexNumber)) {
+            indexHandler->Add(mColumnTables[mSelectionTable], (uint16_t)mSelectionColumn, memory, indexNumber);
+        }
+
+        auto index = indexHandler->GetIndexSelect(indexNumber);
+        int retCount = 0;
+        int* values = index->FindWithoutRecursion((uint64_t)mSelectionValue, retCount);
+
+        if (retCount == 0) {
+            r_sel = new cRowTable(mColumnTables[mSelectionTable]->GetColumnCount());;
+            return;
+        }
+
+        r_sel = new cRowTable(mPreallocateRows, mColumnTables[mSelectionTable]->GetColumnCount());
+
+        for (int i = 0; i < retCount; i++) {
+            r_sel->Add(mColumnTables[mSelectionTable]->GetRow(values[i]), true);
+        }
     }
 }
 

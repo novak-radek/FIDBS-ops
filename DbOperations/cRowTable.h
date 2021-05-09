@@ -16,6 +16,11 @@ private:
 
 	uint64_t GetColumnCount(int column);
 
+	bool HasNextData();
+	cRowTable* GetNextData();
+	int GetActualRowCount();
+	uint64_t GetValue(int row, int column);
+
 public:
 
 	cRowTable(int preallocateRows, int columnCount);
@@ -33,6 +38,7 @@ public:
 	uint64_t* GetColumn(uint32_t column);
 	void GetColumn(uint64_t** out, uint32_t column, uint32_t shift);
 	uint64_t* GetRow(uint32_t row);
+	uint64_t** GetRowPointer(uint32_t row);
 
 	cRowTable* Projection_Sum(int* attrList, int attrCount);
 	cRowTable* Selection(char operation, int column, uint64_t value);
@@ -182,6 +188,10 @@ int cRowTable::GetRowCount() {
 	return mRowCount;
 }
 
+int cRowTable::GetActualRowCount() {
+	return mRowCount;
+}
+
 int cRowTable::GetColumnCount() {
 	return mColumnCount;
 }
@@ -252,16 +262,22 @@ cRowTable* cRowTable::Selection(char operation, int column, uint64_t value) {
 
 uint64_t* cRowTable::GetColumn(uint32_t column) {
 	uint64_t* outp = new uint64_t[GetRowCount()];
+	int index = 0;
 	for (uint32_t i = 0; i < mRowCount; i++) {
 		outp[i] = mData[i][column];
+		index++;
 	}
-	if (mNextData != NULL) {
-		uint64_t* nextColumn = mNextData->GetColumn(column);
-		for (int i = mRowCount; i < GetRowCount(); i++) {
-			outp[i] = nextColumn[i- mRowCount];
-		}
 
-		delete[] nextColumn;
+	if (mNextData != NULL) {
+		cRowTable* invNode = mNextData;
+
+		while (invNode->HasNextData()) {
+			invNode = invNode->GetNextData();
+
+			for (int i = 0; i < invNode->GetActualRowCount(); i++) {
+				outp[index++] = invNode->GetValue(i, (int)column);
+			}
+		}
 	}
 	return outp;
 }
@@ -274,6 +290,27 @@ uint64_t* cRowTable::GetRow(uint32_t row) {
 	else {
 		return mNextData->GetRow(row - mRowCount);
 	}
+}
+
+uint64_t** cRowTable::GetRowPointer(uint32_t row) {
+	if (row < mRowCount) {
+		return &mData[row];
+	}
+	else {
+		return mNextData->GetRowPointer(row - mRowCount);
+	}
+}
+
+bool cRowTable::HasNextData() {
+	return mNextData != NULL;
+}
+
+cRowTable* cRowTable::GetNextData() {
+	return mNextData;
+}
+
+uint64_t cRowTable::GetValue(int row, int column) {
+	return mData[row][column];
 }
 
 

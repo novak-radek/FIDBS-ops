@@ -31,6 +31,7 @@ int main()
         handlers2[i] = new cQueryHandler(inputQuery, preallocateRows, tablesPath);
         handlers3[i++] = new cQueryHandler(inputQuery, preallocateRows, tablesPath);
     }
+    file.close();
     auto tmp1 = std::chrono::high_resolution_clock::now();
     auto tmp2 = std::chrono::high_resolution_clock::now();
     auto hash = std::chrono::duration_cast<std::chrono::duration<double>>(tmp1 - tmp2);
@@ -39,10 +40,13 @@ int main()
     auto nestedloopSelect = std::chrono::duration_cast<std::chrono::duration<double>>(tmp1 - tmp2);
 
     cMemory* memory = new cMemory(10*1024*1024);
+    IndexHandler* indexHandler = new IndexHandler();
+
 
     for (int i = 0; i < numOfRows; i++) {
-
         handlers0[i]->PrintQuery();
+
+
         printf("Hash join:\n");
         auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -77,13 +81,14 @@ int main()
 
         memory->Reset();
 
-        printf("Nested-loop join:\n");
+        printf("Hash join, select with index:\n");
         t1 = std::chrono::high_resolution_clock::now();
 
-        handlers2[i]->Join();
-        handlers2[i]->Select();
+        handlers2[i]->HashJoin(memory);
+        handlers2[i]->SelectWithIndex(memory, indexHandler);
         handlers2[i]->Sum();
         handlers2[i]->ShortPrintData();
+
 
         delete handlers2[i];
 
@@ -92,11 +97,11 @@ int main()
         nestedloop += time_span;
         printf("Duration of operations join, select and sum: %.5fs\n\n", time_span);
 
-        printf("Nested-loop join, select first:\n");
+        printf("Hash join, select with index first:\n");
         t1 = std::chrono::high_resolution_clock::now();
 
-        handlers3[i]->Select();
-        handlers3[i]->Join();
+        handlers3[i]->SelectWithIndex(memory, indexHandler);
+        handlers3[i]->HashJoin(memory);
         handlers3[i]->Sum();
         handlers3[i]->ShortPrintData();
 
@@ -115,13 +120,17 @@ int main()
     printf("\nHash join total duration: %.5fs\n", hash);
     printf("Hash join, select first total duration: %.5fs\n", hashSelect);
     printf("Nested-loop join total duration: %.5fs\n", nestedloop);
-    printf("Nested-loop join, select firs total duration: %.5fs\n", nestedloopSelect);
+    printf("Nested-loop join, select first total duration: %.5fs\n", nestedloopSelect);
+
+
+    
 
 
     delete[] handlers0;
     delete[] handlers1;
     delete[] handlers2;
     delete[] handlers3;
+    delete indexHandler;
     delete memory;
 }
 
